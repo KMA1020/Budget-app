@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Kendra Bills</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0f0d;
+    --surface: #131a16;
+    --card: #1a2420;
+    --border: #2a3830;
+    --accent: #3ddc84;
+    --accent-dim: #1f6e42;
+    --red: #ff5c5c;
+    --text: #e8f0ec;
+    --muted: #6b8a78;
+    --font: 'Manrope', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── SETUP SCREEN ── */
+  #setup-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 32px 24px;
+    text-align: center;
+  }
+
+  #setup-screen h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+
+  #setup-screen p {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 32px;
+    line-height: 1.6;
+    max-width: 320px;
+  }
+
+  .setup-input {
+    width: 100%;
+    max-width: 360px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .setup-input:focus { border-color: var(--accent); }
+  .setup-input::placeholder { color: var(--muted); }
+
+  .btn-primary {
+    width: 100%;
+    max-width: 360px;
+    padding: 16px;
+    background: var(--accent);
+    color: #0a0f0d;
+    font-family: var(--font);
+    font-weight: 800;
+    font-size: 15px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: opacity 0.2s;
+  }
+
+  .btn-primary:active { opacity: 0.8; }
+
+  /* ── MAIN APP ── */
+  #app-screen { display: none; }
+
+  .top-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .top-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+
+  .balance-display {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .balance-display.negative { color: var(--red); }
+
+  .balance-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: var(--mono);
+  }
+
+  .form-body {
+    padding: 20px 20px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  input[type="date"],
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    font-family: var(--font);
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus, select:focus { border-color: var(--accent); }
+
+  select option { background: #1a2420; }
+
+  /* Toggle row */
+  .toggle-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .toggle-btn {
+    padding: 12px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    font-family: var(--font);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+
+  .toggle-btn.active-income {
+    background: #0f2e1e;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .toggle-btn.active-debit {
+    background: #2e0f0f;
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  /* Amount field highlight */
+  #amount.income-mode { border-color: var(--accent-dim); }
+  #amount.debit-mode { border-color: #6e1f1f; }
+
+  /* Submit bar */
+  .submit-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    padding: 16px 20px;
+    background: linear-gradient(to top, var(--bg) 70%, transparent);
+    padding-top: 32px;
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 18px;
+    background: var(--accent);
+    color: #0a0f0d;
+    font-family: var(--font);
+    font-weight: 800;
+    font-size: 16px;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-submit:active { transform: scale(0.98); opacity: 0.9; }
+  .btn-submit:disabled { opacity: 0.4; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    opacity: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.success { border-color: var(--accent); color: var(--accent); }
+  .toast.error { border-color: var(--red); color: var(--red); }
+
+  /* Settings gear */
+  .settings-btn {
+    position: absolute;
+    top: 16px; right: 20px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div style="font-size:48px;margin-bottom:16px">💰</div>
+  <h1>Kendra Bills</h1>
+  <p>Paste your Google Apps Script Web App URL below to connect your budget sheet.</p>
+  <input class="setup-input" id="script-url-input" type="url" placeholder="https://script.google.com/macros/s/..." />
+  <button class="btn-primary" onclick="saveSetup()">Connect My Sheet</button>
+  <p style="margin-top:20px;font-size:12px;color:var(--muted)">See the setup guide for how to get this URL.</p>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-screen">
+  <div class="top-bar" style="position:relative">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start">
+      <div>
+        <div class="top-label">Today's Balance</div>
+        <div class="balance-display" id="balance-display">—</div>
+        <div class="balance-sub" id="balance-sub">Loading...</div>
+      </div>
+      <div>
+        <div class="top-label">⚠ Lowest Ahead</div>
+        <div class="balance-display" id="lowest-display" style="font-size:22px">—</div>
+        <div class="balance-sub" id="lowest-sub"></div>
+      </div>
+    </div>
+    <button class="settings-btn" onclick="resetSetup()" title="Change script URL">⚙️</button>
+  </div>
+
+  <div class="form-body">
+
+    <div class="field-group">
+      <div class="field-label">Date</div>
+      <input type="date" id="entry-date" />
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Description</div>
+      <input type="text" id="entry-desc" placeholder="e.g. Amazon, Honda, Groceries" autocomplete="off" />
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Category</div>
+      <select id="entry-category">
+        <option value="">Select category...</option>
+        <option>Income</option>
+        <option>Debt</option>
+        <option>Needs</option>
+        <option>Grocery/Gas</option>
+        <option>Insurance</option>
+        <option>Mortgage</option>
+        <option>Transportation</option>
+        <option>Utilities</option>
+        <option>Wants</option>
+        <option>Random</option>
+        <option>Adjustment</option>
+        <option>Refund</option>
+        <option>Dividend</option>
+        <option>Munchk M.</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Type</div>
+      <div class="toggle-row">
+        <button class="toggle-btn active-income" id="type-auto" onclick="setType('Auto')">Auto</button>
+        <button class="toggle-btn" id="type-manual" onclick="setType('Manual')">Manual</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Transaction</div>
+      <div class="toggle-row">
+        <button class="toggle-btn" id="txn-income" onclick="setTxn('income')">＋ Income</button>
+        <button class="toggle-btn active-debit" id="txn-debit" onclick="setTxn('debit')">－ Debit</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Amount</div>
+      <input type="number" id="amount" placeholder="0.00" step="0.01" min="0" class="debit-mode" inputmode="decimal" />
+    </div>
+
+  </div>
+
+  <div class="submit-bar">
+    <button class="btn-submit" id="submit-btn" onclick="submitEntry()">Add to Sheet</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const STORAGE_KEY = 'kendra_script_url';
+  let scriptUrl = '';
+  let currentType = 'Auto';
+  let currentTxn = 'debit';
+
+  // ── INIT ──
+  window.onload = () => {
+    scriptUrl = localStorage.getItem(STORAGE_KEY) || '';
+    if (scriptUrl) {
+      showApp();
+    }
+    // Set today's date
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth()+1).padStart(2,'0');
+    const dd = String(today.getDate()).padStart(2,'0');
+    document.getElementById('entry-date').value = `${yyyy}-${mm}-${dd}`;
+  };
+
+  function saveSetup() {
+    const url = document.getElementById('script-url-input').value.trim();
+    if (!url.startsWith('https://script.google.com')) {
+      showToast('Paste a valid Apps Script URL', 'error');
+      return;
+    }
+    localStorage.setItem(STORAGE_KEY, url);
+    scriptUrl = url;
+    showApp();
+  }
+
+  function showApp() {
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    fetchBalance();
+  }
+
+  function resetSetup() {
+    localStorage.removeItem(STORAGE_KEY);
+    document.getElementById('app-screen').style.display = 'none';
+    document.getElementById('setup-screen').style.display = 'flex';
+  }
+
+  // ── TOGGLES ──
+  function setType(t) {
+    currentType = t;
+    document.getElementById('type-auto').className = 'toggle-btn' + (t==='Auto' ? ' active-income' : '');
+    document.getElementById('type-manual').className = 'toggle-btn' + (t==='Manual' ? ' active-income' : '');
+  }
+
+  function setTxn(t) {
+    currentTxn = t;
+    document.getElementById('txn-income').className = 'toggle-btn' + (t==='income' ? ' active-income' : '');
+    document.getElementById('txn-debit').className = 'toggle-btn' + (t==='debit' ? ' active-debit' : '');
+    const amtField = document.getElementById('amount');
+    amtField.className = t === 'income' ? 'income-mode' : 'debit-mode';
+  }
+
+  // ── FETCH BALANCE ──
+  async function fetchBalance() {
+    const balEl = document.getElementById('balance-display');
+    const subEl = document.getElementById('balance-sub');
+    const lowEl = document.getElementById('lowest-display');
+    const lowSub = document.getElementById('lowest-sub');
+    try {
+      const res = await fetch(`${scriptUrl}?action=getBalance`);
+      const data = await res.json();
+      if (data.todayBalance !== undefined) {
+        const bal = parseFloat(data.todayBalance);
+        balEl.textContent = '$' + bal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+        balEl.className = 'balance-display' + (bal < 0 ? ' negative' : '');
+        subEl.textContent = 'as of today';
+      }
+      if (data.lowestBalance !== undefined) {
+        const low = parseFloat(data.lowestBalance);
+        lowEl.textContent = '$' + low.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+        lowEl.className = 'balance-display' + (low < 1300 ? ' negative' : '');
+        lowEl.style.fontSize = '22px';
+        lowSub.textContent = data.lowestDate ? 'hits ' + data.lowestDate : 'lowest is today';
+      }
+    } catch(e) {
+      subEl.textContent = 'Could not load balance';
+    }
+  }
+
+  // ── SUBMIT ──
+  async function submitEntry() {
+    const date = document.getElementById('entry-date').value;
+    const desc = document.getElementById('entry-desc').value.trim();
+    const category = document.getElementById('entry-category').value;
+    const amount = parseFloat(document.getElementById('amount').value);
+
+    if (!date || !desc || !category || !amount || isNaN(amount)) {
+      showToast('Fill in all fields', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+
+    const payload = {
+      action: 'addRow',
+      date,
+      description: desc,
+      category,
+      type: currentType,
+      income: currentTxn === 'income' ? amount : '',
+      debit: currentTxn === 'debit' ? amount : '',
+    };
+
+    try {
+      const res = await fetch(scriptUrl, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('✓ Row added!', 'success');
+        document.getElementById('entry-desc').value = '';
+        document.getElementById('amount').value = '';
+        document.getElementById('entry-category').value = '';
+        fetchBalance();
+      } else {
+        showToast('Error: ' + (data.error || 'Unknown'), 'error');
+      }
+    } catch(e) {
+      showToast('Connection failed', 'error');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Add to Sheet';
+  }
+
+  // ── TOAST ──
+  function showToast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => { t.className = 'toast'; }, 2800);
+  }
+</script>
+</body>
+</html>
