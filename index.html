@@ -449,7 +449,7 @@
       if (data.lowestBalance !== undefined) {
         const low = parseFloat(data.lowestBalance);
         lowEl.textContent = '$' + low.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-        lowEl.className = 'balance-display' + (low < 1300 ? ' negative' : '');
+        lowEl.className = 'balance-display' + (low < 1000 ? ' negative' : '');
         lowEl.style.fontSize = '22px';
         lowSub.textContent = data.lowestDate ? 'hits ' + data.lowestDate : 'lowest is today';
       }
