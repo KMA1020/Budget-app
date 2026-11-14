@@ -451,7 +451,18 @@
         lowEl.textContent = '$' + low.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
         lowEl.className = 'balance-display' + (low < 500 ? ' negative' : '');
         lowEl.style.fontSize = '22px';
-        lowSub.textContent = data.lowestDate ? 'hits ' + data.lowestDate : 'lowest is today';
+        const lowDate = data.lowestDate;
+
+if (lowDate) {
+  const yearIncluded = /\b\d{4}\b/.test(lowDate);
+  const displayDate = yearIncluded
+    ? lowDate
+    : lowDate + ', ' + new Date().getFullYear();
+
+  lowSub.textContent = 'hits ' + displayDate;
+} else {
+  lowSub.textContent = 'lowest is today';
+}
       }
     } catch(e) {
       subEl.textContent = 'Could not load balance';
